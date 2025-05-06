@@ -1,13 +1,18 @@
 //Author: Austin Chua
-//Date: April 21st, 2025
+//Date: May 5th, 2025
 //Purpose: Project #10
 
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
+#include <time.h>
 #define GUESSES 6
 #define WRD_LENGTH 8
-#define rFILE "mystery.txt"
+#define STR_CAP 100
+#define rFILE "mystery_ec.txt"
+#define dFILE "scoreboard.txt"
 
+void loadHighScore(int* n1, int* n2, int* n3, int* n4, int* n5);
 void readTargetWrd(FILE* fout, int size, char wrd[]);
 void displayPrompt(int total, int row, int col, char guess[][col]);
 int wrdCheck(int total, int row, int col, char guess[][col], bool* vGuess);
@@ -19,8 +24,8 @@ bool winCondition(int ct);
 void endResult(int total, bool notWon, int sizeW, char wrd[]);
 
 int main(){
-	int aTotal = 0, count = 0;
-	_Bool noWin = true, validGuess = false;
+	int aTotal = 0, count = 0, pB, pS, pT, pF, pV;
+	_Bool noWin = true, validGuess = false, high_score = false;
 	char targetWrd[WRD_LENGTH], userWrd[GUESSES][WRD_LENGTH], correctArr[GUESSES][WRD_LENGTH];
 	
 	//targetWrd: word to guess, userWrd: entered guess, correctArr: hints '^'
@@ -37,6 +42,9 @@ int main(){
 		fclose(fp1);
 	}
 	
+	loadHighScore(&pB, &pS, &pT, &pF, &pV);
+	printf("\npB: %d, pS: %d, pT: %d, pF: %d, pV: %d\n", pB, pS, pT, pF, pV);
+	
 	while (aTotal < 6 && noWin) { //runs game until either max attempts reached or win condition is met
 		displayPrompt(aTotal, GUESSES, WRD_LENGTH, userWrd);
 		aTotal = wrdCheck(aTotal, GUESSES, WRD_LENGTH, userWrd, &validGuess); //increments "main index" (attempt) for program
@@ -50,14 +58,48 @@ int main(){
 	}
 	
 	endResult(aTotal, noWin, WRD_LENGTH, targetWrd);
-	
+/*	
+	if (newHighScore(high_score, pB, pS, pT);){
+		FILE* fp3;
+		fp3 = fopen(dFILE, "w");
+		
+		if (fp3 == NULL){
+			printf("Unable to open %s!\n", dFILE);
+			return 0;
+		} else {
+			if 
+		}
+	}
+*/	
 	return 0;
 }
 
 void readTargetWrd(FILE* fout, int size, char wrd[]){
+	int counter = 0;
 
-	fgets(wrd, size, fout);
+	char wrds[STR_CAP][size];
+	
+	while (fgets(wrd, size, fout) != NULL){
+		fscanf(fout, "%s", wrds[counter]); //With each loop, stores a word into a row
+		counter++;
+	}
+	
+	srand(time(0));
 
+	int num = (rand() % counter + 1); //chooses a random number between 0 and the total # of words in rFILE
+	
+	//NOTE: COUNT HOW MANY WORDS ARE IN FILE, SAVE EACH INTO ITS OWN ROW IN A NEW 2d ARRAY
+	//	USING RANDOM NUMBER, HAVE THIS FUNCTION DECIDE WHICH ROW IS THE "TARGET WORD", AND SAVE ROW NUMBER
+	//	HERE, COPY THAT SPECIFIC ROW INTO THE targetWrd ARRAY AND ITS SET!
+	
+/*	for (int i = 0; i < counter; i++){ //displays all the scanned words
+		printf("%s", wrds[i]);
+	}
+*/
+	for (int i = 0; wrds[num][i] != '\0'; i++){
+		wrd[i] = wrds[num][i];
+	}
+	
 }
 
 void displayPrompt(int total, int row, int col, char guess[][col]){
@@ -285,3 +327,25 @@ void endResult(int total, bool notWon, int sizeW, char wrd[]){
 	}
 	
 }
+
+void loadHighScore(int* n1, int* n2, int* n3, int* n4, int* n5){
+	FILE* fp2;
+	
+	fp2 = fopen(dFILE, "r");
+	
+	if (fp2 == NULL){
+		printf("Unable to open %s!\n", dFILE);
+		return;
+	} else {
+		fscanf(fp2, "%d %d %d %d %d", n1, n2, n3, n4, n5);
+		fclose(fp2);
+	}
+	
+}
+/*
+bool newHighScore(_Bool hS, int n1, int n2, int n3){
+
+	if (hS > 
+
+}
+*/
