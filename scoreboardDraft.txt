@@ -1,0 +1,36 @@
+1 1 2 3 4
+AUSLBJWSCMPJLOL LBJWSCMPJLOL WSCMPJLOL MPJLOL LOL
+=====================
+HIGHEST SCORES:
+ -> FIRST: 1
+ -> SECOND: 1
+ -> THIRD: 2
+ -> FOURTH: 3
+ -> FIFTH: 4
+
+=====================
+FIRST PLACE: AUSLBJWSCMPJLOL
+
+ --> 1 ATTEMPT
+
+=====================
+SECOND PLACE: LBJWSCMPJLOL
+
+ --> 1 ATTEMPTS
+
+=====================
+THIRD PLACE: WSCMPJLOL
+
+ --> 2 ATTEMPTS
+
+=====================
+FOURTH PLACE: MPJLOL
+
+ --> 3 ATTEMPTS
+
+=====================
+FIFTH PLACE: LOL
+
+ --> 4 ATTEMPTS
+
+=====================

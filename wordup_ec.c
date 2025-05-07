@@ -11,8 +11,9 @@
 #define STR_CAP 100
 #define rFILE "mystery_ec.txt"
 #define dFILE "scoreboard.txt"
+//#define draftFILE "scoreboardCURRENT.txt" //To test functionality before wiping "scoreboard.txt"
 
-void loadHighScore(int size, int num[]);
+void loadHighScore(int size, int num[], int sizeP, int nameL, char players[][nameL]);
 void readTargetWrd(FILE* fout, int size, char wrd[]);
 void displayPrompt(int total, int row, int col, char guess[][col]);
 int wrdCheck(int total, int row, int col, char guess[][col], bool* vGuess);
@@ -22,12 +23,12 @@ void displayWrdResult(int total, int rows, int cols, char guess[][cols], int siz
 void write2DArr(int t, int r, int c, char arr[][c]);
 bool winCondition(int ct);
 void endResult(int total, bool notWon, int sizeW, char wrd[]);
-bool newHighScore(int size, int num[]);
+bool newHighScore(int size, int num[], int sizeP, int nameL, char players[][nameL]);
 
 int main(){
-	int aTotal = 0, count = 0, numL = 6, leaderboard[numL];
+	int aTotal = 0, count = 0, numL = 6, userL = 3, leaderboard[numL];
 	_Bool noWin = true, validGuess = false, high_score;
-	char targetWrd[WRD_LENGTH], userWrd[GUESSES][WRD_LENGTH], correctArr[GUESSES][WRD_LENGTH];
+	char targetWrd[WRD_LENGTH], userWrd[GUESSES][WRD_LENGTH], correctArr[GUESSES][WRD_LENGTH], leaderboardPlayers[numL][userL];
 	
 	//targetWrd: word to guess, userWrd: entered guess, correctArr: hints '^'
 	
@@ -43,8 +44,7 @@ int main(){
 		fclose(fp1);
 	}
 	
-	loadHighScore(numL, leaderboard);
-	printf("\nn1: %d, n2: %d, n3: %d, n4: %d, n5: %d\n", leaderboard[0], leaderboard[1], leaderboard[2], leaderboard[3], leaderboard[4]);
+	loadHighScore(numL, leaderboard, numL, userL, leaderboardPlayers);
 	
 	while (aTotal < 6 && noWin) { //runs game until either max attempts reached or win condition is met
 		displayPrompt(aTotal, GUESSES, WRD_LENGTH, userWrd);
@@ -60,23 +60,32 @@ int main(){
 	
 	endResult(aTotal, noWin, WRD_LENGTH, targetWrd);
 	
-	leaderboard[5] = aTotal;
+	if (!noWin){
+		leaderboard[5] = aTotal;
 	
-	printf("\nOLD: ");
+		printf("\nOLD LEADERBOARD: ");
 	
-	for (int i = 0; i < 6; i++){
-		printf("%d ", leaderboard[i]);
-	}
+		for (int i = 0; i < 5; i++){
+			printf("%d ", leaderboard[i]);
+		}
+		
+		printf("\n\nWhat is your Username?: ");
+		scanf("%s", leaderboardPlayers[5]);
 	
-	high_score = newHighScore(numL, leaderboard);
+		high_score = newHighScore(numL, leaderboard, numL, userL, leaderboardPlayers);
+
+		printf("\nNEW LEADERBOARD: ");
 	
-	printf("\nNEW: ");
+		for (int i = 0; i < 5; i++){
+			printf("%d ", leaderboard[i]);
+		}
+		
+		printf("\n");
+	}	
 	
-	for (int i = 0; i < 6; i++){
-		printf("%d ", leaderboard[i]);
-	}
-	
-/*	if (high_score){
+	//If user reaches a new highscore, it completely formats the scoreboard.txt file and displays full scoreboard in that file
+	if (high_score){
+		
 		FILE* fp3;
 		fp3 = fopen(dFILE, "w");
 		
@@ -84,10 +93,38 @@ int main(){
 			printf("Unable to open %s!\n", dFILE);
 			return 0;
 		} else {
-		
+			printf("\nNEW HIGHSCORE! ");
+			fprintf(fp3, "%d %d %d %d %d\n", leaderboard[0], leaderboard[1], leaderboard[2], leaderboard[3], leaderboard[4]);
+			fprintf(fp3, "%s %s %s %s %s\n", leaderboardPlayers[0], leaderboardPlayers[1], leaderboardPlayers[2], leaderboardPlayers[3], leaderboardPlayers[4]);
+			fprintf(fp3, "=====================\n");
+			fprintf(fp3, "HIGHEST SCORES:\n");
+			fprintf(fp3, " -> FIRST: %d\n", leaderboard[0]);
+			fprintf(fp3, " -> SECOND: %d\n", leaderboard[1]);
+			fprintf(fp3, " -> THIRD: %d\n", leaderboard[2]);
+			fprintf(fp3, " -> FOURTH: %d\n", leaderboard[3]);
+			fprintf(fp3, " -> FIFTH: %d\n\n", leaderboard[4]);
+			fprintf(fp3, "=====================\n");
+			fprintf(fp3, "FIRST PLACE: %s\n\n", leaderboardPlayers[0]);
+			fprintf(fp3, " --> %d ATTEMPT\n\n", leaderboard[0]);
+			fprintf(fp3, "=====================\n");
+			fprintf(fp3, "SECOND PLACE: %s\n\n", leaderboardPlayers[1]);
+			fprintf(fp3, " --> %d ATTEMPTS\n\n", leaderboard[1]);
+			fprintf(fp3, "=====================\n");
+			fprintf(fp3, "THIRD PLACE: %s\n\n", leaderboardPlayers[2]);
+			fprintf(fp3, " --> %d ATTEMPTS\n\n", leaderboard[2]);
+			fprintf(fp3, "=====================\n");
+			fprintf(fp3, "FOURTH PLACE: %s\n\n", leaderboardPlayers[3]);
+			fprintf(fp3, " --> %d ATTEMPTS\n\n", leaderboard[3]);
+			fprintf(fp3, "=====================\n");
+			fprintf(fp3, "FIFTH PLACE: %s\n\n", leaderboardPlayers[4]);
+			fprintf(fp3, " --> %d ATTEMPTS\n\n", leaderboard[4]);
+			fprintf(fp3, "=====================");
+			
+			printf("Results saved in %s!\n", dFILE);
+			fclose(fp3);
 		}
 	}
-*/	
+	
 	return 0;
 }
 
@@ -103,20 +140,20 @@ void readTargetWrd(FILE* fout, int size, char wrd[]){
 	
 	srand(time(0));
 
-	int num = (rand() % counter + 1); //chooses a random number between 0 and the total # of words in rFILE
+	int num = (rand() % counter); //chooses a random number between 0 and the total # of words in rFILE
+	
+	if (num > 51){
+		num = 51;
+	}
 	
 	//NOTE: COUNT HOW MANY WORDS ARE IN FILE, SAVE EACH INTO ITS OWN ROW IN A NEW 2d ARRAY
 	//	USING RANDOM NUMBER, HAVE THIS FUNCTION DECIDE WHICH ROW IS THE "TARGET WORD", AND SAVE ROW NUMBER
 	//	HERE, COPY THAT SPECIFIC ROW INTO THE targetWrd ARRAY AND ITS SET!
 	
-/*	for (int i = 0; i < counter; i++){ //displays all the scanned words
-		printf("%s", wrds[i]);
-	}
-*/
 	for (int i = 0; wrds[num][i] != '\0'; i++){
 		wrd[i] = wrds[num][i];
 	}
-	
+
 }
 
 void displayPrompt(int total, int row, int col, char guess[][col]){
@@ -345,7 +382,7 @@ void endResult(int total, bool notWon, int sizeW, char wrd[]){
 	
 }
 
-void loadHighScore(int size, int num[]){
+void loadHighScore(int size, int num[], int sizeP, int nameL, char players[][nameL]){
 	FILE* fp2;
 	
 	fp2 = fopen(dFILE, "r");
@@ -359,21 +396,25 @@ void loadHighScore(int size, int num[]){
 			fscanf(fp2, "%d ", &num[i]);
 		}
 		
+		//from dFile, reads leaderboard player usernames
+		for (int i = 0; i < 5; i++){
+			fscanf(fp2, "%s ", &players[i]);
+		}
+		
 		fclose(fp2);
 	}
-	
 }
 
-bool newHighScore(int size, int num[]){
+bool newHighScore(int size, int num[], int sizeP, int nameL, char players[][nameL]){
 	int temporary, tempWrd[size], prev[size];
 	
 	//create a copy of original "leaderboard" (for future reference)
-	for (int i = 0; i < 6; i++){
+	for (int i = 0; i < size; i++){
 		prev[i] = num[i];
 	}
 	
 	//inspiration from "Bubble Sort" to sort leaderboard and to check entries
-	for (int i = 0; size - 1; i++){
+	for (int i = 0; i < size - 1; i++){
 		for (int j = i + 1; j < size; j++){
 		
 			if (num[i] > num[j]){
@@ -386,13 +427,12 @@ bool newHighScore(int size, int num[]){
 	}
 	
 	//if anything between the "before" and "after" is different, return "TRUE" as new high-score was recorded
-	for (int i = 0; i < 6; i++){
+	for (int i = 0; i < size; i++){
 		if (num[i] != prev[i]){ 
 			return true;
-		} else {
-			return false;
-		}
+		} 
 	}
-
+	
+	return false;
 }
 
