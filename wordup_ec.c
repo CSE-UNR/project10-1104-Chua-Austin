@@ -12,7 +12,7 @@
 #define rFILE "mystery_ec.txt"
 #define dFILE "scoreboard.txt"
 
-void loadHighScore(int* n1, int* n2, int* n3, int* n4, int* n5);
+void loadHighScore(int size, int num[]);
 void readTargetWrd(FILE* fout, int size, char wrd[]);
 void displayPrompt(int total, int row, int col, char guess[][col]);
 int wrdCheck(int total, int row, int col, char guess[][col], bool* vGuess);
@@ -22,10 +22,11 @@ void displayWrdResult(int total, int rows, int cols, char guess[][cols], int siz
 void write2DArr(int t, int r, int c, char arr[][c]);
 bool winCondition(int ct);
 void endResult(int total, bool notWon, int sizeW, char wrd[]);
+bool newHighScore(int size, int num[]);
 
 int main(){
-	int aTotal = 0, count = 0, pB, pS, pT, pF, pV;
-	_Bool noWin = true, validGuess = false, high_score = false;
+	int aTotal = 0, count = 0, numL = 6, leaderboard[numL];
+	_Bool noWin = true, validGuess = false, high_score;
 	char targetWrd[WRD_LENGTH], userWrd[GUESSES][WRD_LENGTH], correctArr[GUESSES][WRD_LENGTH];
 	
 	//targetWrd: word to guess, userWrd: entered guess, correctArr: hints '^'
@@ -42,8 +43,8 @@ int main(){
 		fclose(fp1);
 	}
 	
-	loadHighScore(&pB, &pS, &pT, &pF, &pV);
-	printf("\npB: %d, pS: %d, pT: %d, pF: %d, pV: %d\n", pB, pS, pT, pF, pV);
+	loadHighScore(numL, leaderboard);
+	printf("\nn1: %d, n2: %d, n3: %d, n4: %d, n5: %d\n", leaderboard[0], leaderboard[1], leaderboard[2], leaderboard[3], leaderboard[4]);
 	
 	while (aTotal < 6 && noWin) { //runs game until either max attempts reached or win condition is met
 		displayPrompt(aTotal, GUESSES, WRD_LENGTH, userWrd);
@@ -58,8 +59,24 @@ int main(){
 	}
 	
 	endResult(aTotal, noWin, WRD_LENGTH, targetWrd);
-/*	
-	if (newHighScore(high_score, pB, pS, pT);){
+	
+	leaderboard[5] = aTotal;
+	
+	printf("\nOLD: ");
+	
+	for (int i = 0; i < 6; i++){
+		printf("%d ", leaderboard[i]);
+	}
+	
+	high_score = newHighScore(numL, leaderboard);
+	
+	printf("\nNEW: ");
+	
+	for (int i = 0; i < 6; i++){
+		printf("%d ", leaderboard[i]);
+	}
+	
+/*	if (high_score){
 		FILE* fp3;
 		fp3 = fopen(dFILE, "w");
 		
@@ -67,7 +84,7 @@ int main(){
 			printf("Unable to open %s!\n", dFILE);
 			return 0;
 		} else {
-			if 
+		
 		}
 	}
 */	
@@ -328,7 +345,7 @@ void endResult(int total, bool notWon, int sizeW, char wrd[]){
 	
 }
 
-void loadHighScore(int* n1, int* n2, int* n3, int* n4, int* n5){
+void loadHighScore(int size, int num[]){
 	FILE* fp2;
 	
 	fp2 = fopen(dFILE, "r");
@@ -337,15 +354,45 @@ void loadHighScore(int* n1, int* n2, int* n3, int* n4, int* n5){
 		printf("Unable to open %s!\n", dFILE);
 		return;
 	} else {
-		fscanf(fp2, "%d %d %d %d %d", n1, n2, n3, n4, n5);
+		//from dFile, reads leaderboard entries
+		for (int i = 0; i < 5; i++){
+			fscanf(fp2, "%d ", &num[i]);
+		}
+		
 		fclose(fp2);
 	}
 	
 }
-/*
-bool newHighScore(_Bool hS, int n1, int n2, int n3){
 
-	if (hS > 
+bool newHighScore(int size, int num[]){
+	int temporary, tempWrd[size], prev[size];
+	
+	//create a copy of original "leaderboard" (for future reference)
+	for (int i = 0; i < 6; i++){
+		prev[i] = num[i];
+	}
+	
+	//inspiration from "Bubble Sort" to sort leaderboard and to check entries
+	for (int i = 0; size - 1; i++){
+		for (int j = i + 1; j < size; j++){
+		
+			if (num[i] > num[j]){
+				temporary = num[i];
+				num[i] = num[j];
+				num[j] = temporary;
+			}
+			
+		}
+	}
+	
+	//if anything between the "before" and "after" is different, return "TRUE" as new high-score was recorded
+	for (int i = 0; i < 6; i++){
+		if (num[i] != prev[i]){ 
+			return true;
+		} else {
+			return false;
+		}
+	}
 
 }
-*/
+

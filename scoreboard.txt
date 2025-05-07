@@ -5,16 +5,32 @@ HIGHEST SCORES:
  -> FIRST: 1
  -> SECOND: 2
  -> THIRD: 3
+ -> FOURTH: 4
+ -> FIFTH: 5
+ 
 =====================
 FIRST PLACE: AUS
 
+ --> 1 ATTEMPT
 
 =====================
 SECOND PLACE: LBJ
 
+ --> 2 ATTEMPTS
 
 =====================
-SECOND PLACE: WSC
+THIRD PLACE: WSC
 
+ --> 3 ATTEMPTS
+
+=====================
+FOURTH PLACE: MPJ
+
+ --> 4 ATTEMPTS
+
+=====================
+FIFTH PLACE: LOL
+
+ --> 5 ATTEMPTS
 
 =====================
